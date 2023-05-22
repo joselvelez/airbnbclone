@@ -1,14 +1,16 @@
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import globalPrismaClient from "@/app/libs/prismadb";
 import CredentialsProvider from "next-auth/providers/credentials";
 import NextAuth, { AuthOptions } from "next-auth";
 import GithubProvider from 'next-auth/providers/github'
 import GoogleProvider from 'next-auth/providers/google'
 import bcrypt from 'bcrypt'
 
-import prisma from "@/app/libs/prismadb";
-
 export const authOptions: AuthOptions = {
-    adapter: PrismaAdapter(prisma),
+    adapter: PrismaAdapter(globalPrismaClient),
+    session: {
+        strategy: 'jwt'
+    },
     providers: [
         GithubProvider({
             clientId: process.env.GITHUB_ID as string,
@@ -39,12 +41,11 @@ export const authOptions: AuthOptions = {
                     throw new Error('Invalid credentials');
                 }
 
-                const user = await prisma.user.findUnique({
+                const user = await globalPrismaClient.user.findUnique({
                     where: {
                         email: credentials.email
                     }
                 });
-
                 if (!user || !user.hashedPassword) {
                     throw new Error('Invalid credentials');
                 }
@@ -57,7 +58,6 @@ export const authOptions: AuthOptions = {
                 if (!isCorrectPassword) {
                     throw new Error('Inalid credentials');
                 }
-
                 return user;
             }
         })
@@ -66,9 +66,6 @@ export const authOptions: AuthOptions = {
         signIn: '/',
     },
     debug: process.env.NODE_ENV === 'development',
-    session: {
-        strategy: 'jwt'
-    },
     secret: process.env.NEXTAUTH_SECRET,
 };
 
