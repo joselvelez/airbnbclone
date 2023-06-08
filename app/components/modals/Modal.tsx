@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { IoMdClose } from 'react-icons/io'
 import Button from "../Button";
 
@@ -17,7 +17,7 @@ interface ModalProps {
     secondaryActionLabel?: string;
 }
 
-const Modal:React.FC<ModalProps> = ({
+const Modal: React.FC<ModalProps> = ({
     isOpen,
     onClose,
     onSubmit,
@@ -52,7 +52,7 @@ const Modal:React.FC<ModalProps> = ({
         }
 
         onSubmit();
-    }, [disabled, onsubmit]);
+    }, [disabled, onSubmit]);
 
     const handleSecondaryAction = useCallback(() => {
         if (disabled || !secondaryAction) {
